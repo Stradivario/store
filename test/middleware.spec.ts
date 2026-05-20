@@ -1,9 +1,9 @@
-import { Store, mapA, mapNS, mapPS, filterA, filterNS, filterPS, reduceA, reduceNS, reducePS } from '../src/index';
+import { Store, mapA, mapNS, mapPS} from '../src/index';
 
-import { MockState, MockInitValue, MockActionsEnum, MockReducer, add, remove, MockActionUnion } from './mock';
+import { MockState, MockInitValue, MockReducer, add, MockActionUnion } from './mock';
 import { of, Subject } from 'rxjs';
 import { skip } from 'rxjs/operators';
-import { Middleware } from 'src/interfaces';
+import { Middleware } from '../src/interfaces';
 
 describe('Store', () => {
   let store: Store<MockState, typeof MockActionUnion.actions>;
@@ -12,7 +12,7 @@ describe('Store', () => {
   const middleware$ = new Subject<Middleware<MockState, typeof MockActionUnion.actions>>();
 
   beforeEach(() => {
-    store = new Store({
+    store = new Store<MockState, typeof MockActionUnion.actions>({
       initialState$: of(MockInitValue),
       reducer$: of(MockReducer),
       actionStream$: actionStream$.asObservable(),

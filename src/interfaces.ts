@@ -13,6 +13,10 @@ export interface StoreConfig<State, ActionUnion> {
   initialState$?: Observable<State>;
   middleware$?: Observable<Middleware<State, ActionUnion>>;
   destroy$?: Observable<any>;
+  epic$?: (
+    action$: Observable<ActionUnion>,
+    state$: Observable<State>
+  ) => Observable<ActionUnion>;
 }
 
 export interface StoreOptions {

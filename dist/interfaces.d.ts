@@ -11,6 +11,7 @@ export interface StoreConfig<State, ActionUnion> {
     initialState$?: Observable<State>;
     middleware$?: Observable<Middleware<State, ActionUnion>>;
     destroy$?: Observable<any>;
+    epic$?: (action$: Observable<ActionUnion>, state$: Observable<State>) => Observable<ActionUnion>;
 }
 export interface StoreOptions {
     actionFlatOp?: FlattenOperator;
@@ -18,7 +19,7 @@ export interface StoreOptions {
     bufferSize?: number;
     windowTime?: number;
 }
-export declare type AsyncType<T> = T | Promise<T> | Observable<T>;
-export declare type ReducerFn<State, A> = (state: State, action: A) => State;
-export declare type MiddlewareFn<State, A> = (reducer: ReducerFn<State, A>) => ReducerFn<State, A>;
-export declare type Middleware<T, A> = MiddlewareFn<T, A>[];
+export type AsyncType<T> = T | Promise<T> | Observable<T>;
+export type ReducerFn<State, A> = (state: State, action: A) => State;
+export type MiddlewareFn<State, A> = (reducer: ReducerFn<State, A>) => ReducerFn<State, A>;
+export type Middleware<T, A> = MiddlewareFn<T, A>[];

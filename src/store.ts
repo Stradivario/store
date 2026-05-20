@@ -60,7 +60,7 @@ export class Store<State = {}, ActionsUnion = any> {
       shareReplayConfig
     } = getDefaults<State, ActionsUnion>(this.config, this.options, this._dispatch$);
 
-    this.state$ = combineLatest(initialState$, reducer$, middleware$).pipe(
+    this.state$ = combineLatest([initialState$, reducer$, middleware$]).pipe(
       map(reducerFactory$),
       concatMap(actionStream$),
       startWith(initialState$),
@@ -72,6 +72,17 @@ export class Store<State = {}, ActionsUnion = any> {
     this.state$.subscribe();
 
     this.actions$ = actions$.pipe<ActionsUnion>(shareReplay(shareReplayConfig));
+
+    // Wire up epic$ if provided
+    if (this.config?.epic$) {
+      this.config
+        .epic$(this.actions$, this.state$)
+        .pipe(takeUntil(destroy$))
+        .subscribe({
+          next: (action) => this.dispatch(action),
+          error: (err) => console.error('[Epic] Error:', err),
+        });
+    }
   }
 
   dispatch = (action: ActionsUnion) => {
