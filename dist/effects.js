@@ -25,9 +25,7 @@ function createEffect(options = { dispatch: true }) {
         return (action$) => {
             const mappedEffect$ = effectFactory(action$);
             if (!options.dispatch) {
-                return mappedEffect$.pipe((0, operators_1.tap)(() => {
-                    /* side effect only */
-                }), (0, operators_1.catchError)((error) => {
+                return mappedEffect$.pipe((0, operators_1.ignoreElements)(), (0, operators_1.catchError)((error) => {
                     console.error('[Effect] Error:', error);
                     return (0, rxjs_1.of)();
                 }));

@@ -1,5 +1,5 @@
 import { merge, Observable, of, Subject } from 'rxjs';
-import { catchError, filter, takeUntil, tap } from 'rxjs/operators';
+import { catchError, filter, ignoreElements, takeUntil, tap } from 'rxjs/operators';
 
 /**
  * Action creator interface - has a `type` property and is callable
@@ -48,9 +48,7 @@ export function createEffect<A = any>(
 
       if (!options.dispatch) {
         return mappedEffect$.pipe(
-          tap(() => {
-            /* side effect only */
-          }),
+          ignoreElements(),
           catchError((error) => {
             console.error('[Effect] Error:', error);
             return of();
