@@ -19,11 +19,12 @@ function ofType(...actionCreators) {
 /**
  * createEffect - factory pattern for creating effects
  * Usage: createEffect()(action$ => action$.pipe(ofType(...), switchMap(...)))
+ * Usage with state: createEffect()((action$, state$) => action$.pipe(ofType(...), withLatestFrom(state$), ...))
  */
 function createEffect(options = { dispatch: true }) {
     return (effectFactory) => {
-        return (action$) => {
-            const mappedEffect$ = effectFactory(action$);
+        return (action$, state$) => {
+            const mappedEffect$ = effectFactory(action$, state$);
             if (!options.dispatch) {
                 return mappedEffect$.pipe((0, operators_1.ignoreElements)(), (0, operators_1.catchError)((error) => {
                     console.error('[Effect] Error:', error);
@@ -40,11 +41,12 @@ function createEffect(options = { dispatch: true }) {
 /**
  * createSubscriptionEffect - for subscription-style effects with auto-takeUntil
  * Usage: createSubscriptionEffect(destroy$)(action$ => action$.pipe(...))
+ * Usage with state: createSubscriptionEffect(destroy$)((action$, state$) => ...)
  */
 function createSubscriptionEffect(destroy$) {
     return (effectFactory) => {
-        return (action$) => {
-            return effectFactory(action$).pipe((0, operators_1.takeUntil)(destroy$), (0, operators_1.catchError)((error) => {
+        return (action$, state$) => {
+            return effectFactory(action$, state$).pipe((0, operators_1.takeUntil)(destroy$), (0, operators_1.catchError)((error) => {
                 console.error('[Effect] Error:', error);
                 return (0, rxjs_1.of)();
             }));
@@ -54,10 +56,10 @@ function createSubscriptionEffect(destroy$) {
 /**
  * createEpicRegistry - combines multiple effects into a single epic
  * Usage: epic$ = createEpicRegistry(effect1, effect2, effect3)
+ * Each effect may optionally receive state$ as a second argument.
  */
 function createEpicRegistry(...effects) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    return (action$, _state$) => {
-        return (0, rxjs_1.merge)(...effects.map((effect) => effect(action$)));
+    return (action$, state$) => {
+        return (0, rxjs_1.merge)(...effects.map((effect) => effect(action$, state$)));
     };
 }

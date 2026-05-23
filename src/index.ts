@@ -5,6 +5,6 @@ export {
   StoreOptions,
 } from './interfaces';
 export { Store, createStore } from './store';
-export { mapToObservable, catchErr, flatCatch } from './utils';
+export { mapToObservable, catchErr, flatCatch, combineReducers } from './utils';
 export * from './middleware';
 export * from './effects';

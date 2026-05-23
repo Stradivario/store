@@ -14,7 +14,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.flatCatch = exports.catchErr = exports.mapToObservable = exports.createStore = exports.Store = exports.FlattenOperator = void 0;
+exports.combineReducers = exports.flatCatch = exports.catchErr = exports.mapToObservable = exports.createStore = exports.Store = exports.FlattenOperator = void 0;
 var interfaces_1 = require("./interfaces");
 Object.defineProperty(exports, "FlattenOperator", { enumerable: true, get: function () { return interfaces_1.FlattenOperator; } });
 var store_1 = require("./store");
@@ -24,5 +24,6 @@ var utils_1 = require("./utils");
 Object.defineProperty(exports, "mapToObservable", { enumerable: true, get: function () { return utils_1.mapToObservable; } });
 Object.defineProperty(exports, "catchErr", { enumerable: true, get: function () { return utils_1.catchErr; } });
 Object.defineProperty(exports, "flatCatch", { enumerable: true, get: function () { return utils_1.flatCatch; } });
+Object.defineProperty(exports, "combineReducers", { enumerable: true, get: function () { return utils_1.combineReducers; } });
 __exportStar(require("./middleware"), exports);
 __exportStar(require("./effects"), exports);

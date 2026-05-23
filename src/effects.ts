@@ -33,18 +33,24 @@ export function ofType<A>(
   };
 }
 
+export type EffectFactory<A, S = unknown> = (
+  action$: Observable<A>,
+  state$: Observable<S>,
+) => Observable<A>;
+
 /**
  * createEffect - factory pattern for creating effects
  * Usage: createEffect()(action$ => action$.pipe(ofType(...), switchMap(...)))
+ * Usage with state: createEffect()((action$, state$) => action$.pipe(ofType(...), withLatestFrom(state$), ...))
  */
-export function createEffect<A = any>(
+export function createEffect<A = any, S = unknown>(
   options: EffectOptions = { dispatch: true },
 ) {
   return (
-    effectFactory: (action$: Observable<A>) => Observable<A>,
-  ): ((action$: Observable<A>) => Observable<A>) => {
-    return (action$: Observable<A>): Observable<A> => {
-      const mappedEffect$: Observable<A> = effectFactory(action$);
+    effectFactory: EffectFactory<A, S>,
+  ): EffectFactory<A, S> => {
+    return (action$: Observable<A>, state$: Observable<S>): Observable<A> => {
+      const mappedEffect$: Observable<A> = effectFactory(action$, state$);
 
       if (!options.dispatch) {
         return mappedEffect$.pipe(
@@ -69,13 +75,14 @@ export function createEffect<A = any>(
 /**
  * createSubscriptionEffect - for subscription-style effects with auto-takeUntil
  * Usage: createSubscriptionEffect(destroy$)(action$ => action$.pipe(...))
+ * Usage with state: createSubscriptionEffect(destroy$)((action$, state$) => ...)
  */
 export function createSubscriptionEffect(destroy$: Subject<void>) {
-  return <A>(
-    effectFactory: (action$: Observable<A>) => Observable<A>,
-  ): ((action$: Observable<A>) => Observable<A>) => {
-    return (action$: Observable<A>): Observable<A> => {
-      return effectFactory(action$).pipe(
+  return <A, S = unknown>(
+    effectFactory: EffectFactory<A, S>,
+  ): EffectFactory<A, S> => {
+    return (action$: Observable<A>, state$: Observable<S>): Observable<A> => {
+      return effectFactory(action$, state$).pipe(
         takeUntil(destroy$),
         catchError((error) => {
           console.error('[Effect] Error:', error);
@@ -98,13 +105,13 @@ export type EpicFn<State, A> = (
 /**
  * createEpicRegistry - combines multiple effects into a single epic
  * Usage: epic$ = createEpicRegistry(effect1, effect2, effect3)
+ * Each effect may optionally receive state$ as a second argument.
  */
 export function createEpicRegistry<State, A>(
-  ...effects: Array<(action$: Observable<A>) => Observable<A>>
+  ...effects: Array<EffectFactory<A, State>>
 ): EpicFn<State, A> {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  return (action$, _state$): Observable<A> => {
-    return merge(...effects.map((effect) => effect(action$)));
+  return (action$, state$): Observable<A> => {
+    return merge(...effects.map((effect) => effect(action$, state$)));
   };
 }
 
