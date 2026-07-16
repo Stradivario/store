@@ -1,4 +1,5 @@
 import { Observable } from 'rxjs';
+import { DevToolsConfig } from './devtools';
 export declare enum FlattenOperator {
     switchMap = "switchMap",
     mergeMap = "mergeMap",
@@ -12,6 +13,15 @@ export interface StoreConfig<State, ActionUnion> {
     middleware$?: Observable<Middleware<State, ActionUnion>>;
     destroy$?: Observable<any>;
     epic$?: (action$: Observable<ActionUnion>, state$: Observable<State>) => Observable<ActionUnion>;
+    /**
+     * Connect this store to the Redux DevTools browser extension.
+     * `true` enables it with defaults; an options object customizes it;
+     * `false`/`undefined` (or `enabled: false`) keeps it off. Wraps the
+     * reducer for time-travel support and streams every (action, state)
+     * pair to the extension. Inert when the extension is not installed.
+     * Disconnects automatically on `destroy$`.
+     */
+    devTools?: DevToolsConfig;
 }
 export interface StoreOptions {
     actionFlatOp?: FlattenOperator;

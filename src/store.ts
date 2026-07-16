@@ -1,4 +1,4 @@
-import { Observable, combineLatest, Subject } from 'rxjs';
+import { Observable, combineLatest, Subject, of } from 'rxjs';
 import {
   startWith,
   shareReplay,
@@ -7,8 +7,13 @@ import {
   map
 } from 'rxjs/operators';
 import { reducerFactory$ } from './reducer.factory';
-import { StoreConfig, StoreOptions } from './interfaces';
+import { StoreConfig, StoreOptions, ReducerFn } from './interfaces';
 import { getDefaults } from './defaults';
+import {
+  connectReduxDevTools,
+  normalizeDevToolsConfig,
+  withDevToolsTimeTravel
+} from './devtools';
 import { Action } from 'ts-action';
 
 /**
@@ -49,6 +54,19 @@ export class Store<State = {}, ActionsUnion = any> {
     private config?: StoreConfig<State, ActionsUnion>,
     private options?: StoreOptions
   ) {
+    // Wrap the reducer before getDefaults consumes it, so DevTools
+    // time-travel jumps are honored even with the default identity reducer.
+    const devToolsOptions = normalizeDevToolsConfig(this.config?.devTools);
+    if (devToolsOptions) {
+      this.config = {
+        ...this.config,
+        reducer$: (
+          this.config?.reducer$ ??
+          of<ReducerFn<State, ActionsUnion>>(state => state)
+        ).pipe(map(reducerFn => withDevToolsTimeTravel(reducerFn)))
+      };
+    }
+
     const {
       reducer$,
       actions$,
@@ -82,6 +100,12 @@ export class Store<State = {}, ActionsUnion = any> {
           next: (action) => this.dispatch(action),
           error: (err) => console.error('[Epic] Error:', err),
         });
+    }
+
+    if (devToolsOptions) {
+      const disconnect = connectReduxDevTools(this, devToolsOptions);
+      // Mirror takeUntil(destroy$): the first emission tears the store down.
+      destroy$.subscribe(() => disconnect());
     }
   }
 

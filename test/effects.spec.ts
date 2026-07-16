@@ -73,7 +73,7 @@ describe('Effects', () => {
         )
       );
 
-      const output$ = effect$(actions$);
+      const output$ = effect$(actions$, of({}));
 
       output$.pipe(take(1)).subscribe((action: any) => {
         expect(action.type).toBe('ADDED');
@@ -99,7 +99,7 @@ describe('Effects', () => {
       );
 
       // Must subscribe to trigger the effect
-      effect$(actions$).subscribe();
+      effect$(actions$, of({})).subscribe();
 
       // dispatch: false means effect runs but doesn't emit actions
       setTimeout(() => {
@@ -127,7 +127,7 @@ describe('Effects', () => {
         )
       );
 
-      const output$ = effect$(actions$);
+      const output$ = effect$(actions$, of({}));
 
       output$.pipe(take(1)).subscribe((action: any) => {
         expect(action.type).toBe('CONNECTED');

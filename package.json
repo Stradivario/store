@@ -1,6 +1,6 @@
 {
-  "name": "@reactive-redux/store",
-  "version": "6.3.12",
+  "name": "@rxdi/redux-store",
+  "version": "6.5.0",
   "description": "Reactive state container",
   "author": "Zdravko Tatarski",
   "license": "MIT",
